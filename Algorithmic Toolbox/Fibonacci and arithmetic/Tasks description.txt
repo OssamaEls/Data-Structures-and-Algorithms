@@ -1,0 +1,30 @@
+## fibonacci:
+Given an integer 𝑛, find the 𝑛th Fibonacci number 𝐹𝑛.
+
+## fibonacci_last_digit:
+Given an integer 𝑛, find the last digit of the 𝑛th Fibonacci number 𝐹𝑛 (that is, 𝐹𝑛 mod 10)
+
+## greatest_common_divisor:
+Given two integers 𝑎 and 𝑏, find their greatest common divisor.
+
+## least_common_multiple:
+Given two integers 𝑎 and 𝑏, find their least common multiple.
+
+## fibonacci_modulo_m:
+Given two integers 𝑛 and 𝑚, output 𝐹𝑛 mod 𝑚 (that is, the remainder of 𝐹𝑛 when divided by 𝑚).
+### Solution idea: 𝐹𝑛 mod 𝑚 is periodic.
+
+## fibonacci_sum_last_digit:
+Given an integer 𝑛, find the last digit of the sum 𝐹0 + 𝐹1 + · · · + 𝐹𝑛
+### Solution idea: there is a formula for 𝐹0 + 𝐹1 + 𝐹2 + · · · + 𝐹𝑛. use fibonacci_modulo_m
+
+## fibonacci_partial_sum_last_digit:
+Given two non-negative integers 𝑚 and 𝑛, where 𝑚 ≤ 𝑛, find the last digit of the sum 𝐹𝑚 + 𝐹𝑚+1 +
+· · · + 𝐹𝑛.
+
+## fibonacci_sum_squares_last_digit:
+Compute the last digit of 𝐹0^2 + 𝐹1^2 + · · · + 𝐹𝑛^2.
+### Solution idea: there is a simple formula for 𝐹0^2 +𝐹1^2 +· · ·+𝐹𝑛^2.
+
+
+
