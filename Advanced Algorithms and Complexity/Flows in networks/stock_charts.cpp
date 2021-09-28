@@ -1,15 +1,10 @@
-﻿//Input Format.The first line of the input contains integers 𝑛and 𝑚 — the number of flightsand the number
-//of crews respectively.Each of the next 𝑛 lines contains 𝑚 binary integers(0 or 1).If the 𝑗 - th integer
-//in the 𝑖 - th line is 1, then the crew number 𝑗 can work on the flight number 𝑖, and if it is 0, then it
-//cannot.
-//
-//Constraints. 1 ≤ 𝑛, 𝑚 ≤ 100.
-//
-//Output Format.Output 𝑛 integers — for each flight, output the 1 - based index of the crew assigned to
-//this flight.If no crew is assigned to a flight, output −1 as the index of the crew corresponding to it.
-//All the positive indices in the output must be between 1 and 𝑚, and they must be pairwise different,
-//but you can output any number of −1’s.If there are several assignments with the maximum possible
-//number of flights having a crew assigned, output any of them.
+﻿//Input Format.The first line of the input contains two integers 𝑛and 𝑘 — the number of stocksand the
+//number of points in the year which are common for all of them.Each of the next 𝑛 lines contains 𝑘
+//integers.The 𝑖 - th of those 𝑛 lines contains the prices of the 𝑖 - th stock at the corresponding 𝑘 points
+//in the year.
+//Constraints. 1 ≤ 𝑛 ≤ 100; 1 ≤ 𝑘 ≤ 25. All the stock prices are between 0 and 1 000 000.
+//Output Format.Output a single integer — the minimum number of overlaid charts to visualize all the
+//stock price data you have.
 
 #include <iostream>
 #include <vector>
@@ -19,8 +14,8 @@
 using std::vector;
 using std::cin;
 using std::cout;
-using std::queue;
 using std::pair;
+using std::queue;
 
 
 /* This class implements a bit unusual scheme for storing edges of the graph,
@@ -77,30 +72,41 @@ public:
     }
 };
 
-FlowGraph read_data(int num_left, int num_right) {
+bool compare(const vector<int>& stock1, const vector<int>& stock2) {
+    for (int i = 0; i < stock1.size(); ++i)
+        if (stock1[i] >= stock2[i])
+            return false;
+    return true;
+}
 
-    int vertex_count = num_left + num_right + 2;
+FlowGraph read_data(int num_stocks, int num_points) {
+
+    int vertex_count = 2 * num_stocks + 2;
+
+    vector<vector<int>> stock_data(num_stocks, vector<int>(num_points));
+    for (int i = 0; i < num_stocks; ++i)
+        for (int j = 0; j < num_points; ++j) {
+            cin >> stock_data[i][j];
+        }
 
     FlowGraph graph(vertex_count);
-    for (int i = 0; i < num_left; ++i) {
+    for (int i = 0; i < num_stocks; ++i) {
         graph.add_edge(0, i + 1, 1);
+        graph.add_edge(num_stocks + i + 1, vertex_count - 1, 1);
     }
 
-    for (int i = 0; i < num_right; ++i) {
-        graph.add_edge(num_left + i + 1, vertex_count - 1, 1);
-    }
 
-    for (int i = 0; i < num_left; ++i)
-        for (int j = 0; j < num_right; ++j) {
-            int bit;
-            cin >> bit;
-            if (bit)
-                graph.add_edge(i + 1, num_left + j + 1, 1);
+    for (int i = 0; i < num_stocks; ++i)
+    {
+        for (int j = 0; j < num_stocks; ++j)
+        {
+            if (i != j && compare(stock_data[i], stock_data[j]))
+                graph.add_edge(i + 1, num_stocks + j + 1, 1);
         }
+    }
 
     return graph;
 }
-
 
 vector<pair<int, int>> get_path(FlowGraph& graph) {
     const int n = graph.size();
@@ -148,49 +154,38 @@ vector<pair<int, int>> get_path(FlowGraph& graph) {
 
 }
 
-void print_path(vector<pair<int, int>> path, FlowGraph& graph)
-{
-    std::cout << "path is: ";
-    for (size_t i = 0; i < path.size(); i++)
-    {
-        std::cout << path[i].first << ' ';
-    }
-    std::cout << graph.size() - 1 << '\n';
-}
+//void print_path(vector<pair<int, int>> path, FlowGraph& graph)
+//{
+//    std::cout << "path is;
+//    for (size_t i = 0; i < path.size(); i++)
+//    {
+//        std::cout << path[i].first << ' ';
+//    }
+//    std::cout << graph.size() - 1 << '\n';
+//}
 
-vector<int> max_flow(FlowGraph& graph, int num_left) {
+int min_charts(FlowGraph& graph) {
 
     const int n = graph.size();
-
 
     while (true)
     {
         vector<pair<int, int>> path = get_path(graph);
-
         if (path.empty())
         {
-            vector<int> matching(num_left, -1);
-            vector<size_t> vertex_edges;
-            for (size_t left_vertex = 0; left_vertex < num_left; left_vertex++)
+            int num_paths = 0;
+            int num_stocks = (n - 2) / 2;
+            vector<size_t> vertex_edges = graph.get_ids(n - 1);
+            for (size_t id = 0; id < vertex_edges.size(); ++id)
             {
-                vertex_edges = graph.get_ids(left_vertex + 1);
-                for (size_t edge = 0; edge < vertex_edges.size(); edge++)
-                {
-                    if (vertex_edges[edge] % 2 == 0)
-                    {
-                        if (graph.get_edge(vertex_edges[edge]).flow > 0)
-                        {
-                            matching[left_vertex] = graph.get_edge(vertex_edges[edge]).to - num_left - 1;
-                            break;
-                        }
-                    }
-                }
+                if (vertex_edges[id] % 2 == 1)
+                    if (graph.get_edge(vertex_edges[id]).flow < 0)
+                        ++num_paths;
             }
-            return matching;
+            return num_stocks - num_paths;
         }
         else
         {
-            int kth_vertex = 0;
             for (size_t i = 0; i < path.size(); i++)
             {
                 graph.add_flow(path[i].second, 1);
@@ -201,26 +196,13 @@ vector<int> max_flow(FlowGraph& graph, int num_left) {
 
 }
 
-void writeResponse(const vector<int>& matching) {
-    for (int i = 0; i < matching.size(); ++i) {
-        if (i > 0)
-            cout << " ";
-        if (matching[i] == -1)
-            cout << "-1";
-        else
-            cout << (matching[i] + 1);
-    }
-    cout << "\n";
-}
-
-int main() {
+int main()
+{
     std::ios_base::sync_with_stdio(false);
-
-    int num_left, num_right;
-    cin >> num_left >> num_right;
-    FlowGraph graph = read_data(num_left, num_right);
-    vector<int> matching = max_flow(graph, num_left);
-    writeResponse(matching);
+    int num_stocks, num_points;
+    cin >> num_stocks >> num_points;
+    FlowGraph graph = read_data(num_stocks, num_points);
+    cout << min_charts(graph) << "\n";
 
     return 0;
 }

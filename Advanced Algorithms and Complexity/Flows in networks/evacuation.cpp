@@ -159,7 +159,7 @@ void print_path(vector<pair<int, int>> path, FlowGraph& graph)
 
 int max_flow(FlowGraph& graph, int from, int to) {
     int flow = 0;
-    /* your code goes here */
+
     const int n = graph.size();
 
 
@@ -181,7 +181,7 @@ int max_flow(FlowGraph& graph, int from, int to) {
                 }
             }
 
-            int kth_vertex = 0;
+
             for (size_t i = 0; i < path.size(); i++)
             {
                 graph.add_flow(path[i].second, min_capacity);
